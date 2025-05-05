@@ -1,15 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { API } from "./requestHandler";
 import { AppointmentCard } from "./AppointmentCard";
+import { usePolling } from "./hooks/usePolling";
 
 type Appointments = Array<Record<string, string>>;
 const POLLING_INTERVAL = 25000; // 25 seconds
 
-const fetchAppointments = async (
-  setAppointments: (appointment: Appointments) => void
-) => {
-  const response = await API.get("/appointments");
-  return setAppointments(response as Appointments);
+const fetchAppointments = async () => {
+  const response: Appointments = await API.get("/appointments");
+  return response;
 };
 
 const clearAppointments = async () => {
@@ -20,33 +19,24 @@ const clearAppointments = async () => {
 export const UpcomingAppointments = () => {
   const [appointments, setAppointments] = useState<Appointments>([]);
 
-  const intervalRef = React.useRef<number>(null);
-
-  useEffect(() => {
-    if (appointments.length >= 10 && intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-  }, [appointments.length]);
-
-  useEffect(() => {
-    fetchAppointments(setAppointments);
-
-    if (!intervalRef.current) {
-      intervalRef.current = setInterval(
-        () => fetchAppointments(setAppointments),
-        POLLING_INTERVAL
-      );
-    }
-
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-      clearAppointments();
-    };
+  const getAppointments = useCallback(async () => {
+    const appointments = await fetchAppointments();
+    setAppointments(appointments);
   }, []);
+
+  const clearAppointments = useCallback(async () => {
+    await clearAppointments();
+    setAppointments([]);
+  }, []);
+
+  usePolling({
+    pollFn: getAppointments,
+    cleanupFn: clearAppointments,
+    interval: POLLING_INTERVAL,
+    maxIntervalIterations: 10,
+    invokeImmediately: true,
+  });
+
   return (
     <>
       {appointments.map((appointment) => (
