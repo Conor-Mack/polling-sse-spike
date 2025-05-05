@@ -1,24 +1,27 @@
-import React, { useEffect, useRef } from "react";
-
-const DEFAULT_POLLING_INTERVAL = 25000; // 25 seconds
+import React, { useCallback, useEffect, useRef } from "react";
 
 interface UsePollingProps {
   pollFn: () => Promise<void>;
   interval: number;
   maxIntervalIterations?: number;
-  cleanupFn?: () => Promise<void>;
   invokeImmediately?: boolean;
+  cleanupFn?: () => Promise<void>;
 }
 
 export const usePolling = ({
   pollFn,
-  interval = DEFAULT_POLLING_INTERVAL,
+  interval,
   maxIntervalIterations,
   invokeImmediately,
   cleanupFn,
 }: UsePollingProps) => {
   const pollingIntervalRef = useRef<number>(null);
   const iterationCountRef = useRef<number>(0);
+
+  const _pollingFn = useCallback(() => {
+    iterationCountRef.current += 1;
+    pollFn();
+  }, [pollFn]);
 
   useEffect(() => {
     if (
@@ -32,9 +35,9 @@ export const usePolling = ({
 
   useEffect(() => {
     if (!pollingIntervalRef.current) {
-      invokeImmediately && pollFn();
+      invokeImmediately && _pollingFn();
 
-      pollingIntervalRef.current = setInterval(() => pollFn(), interval);
+      pollingIntervalRef.current = setInterval(() => _pollingFn(), interval);
     }
 
     return () => {
@@ -44,5 +47,5 @@ export const usePolling = ({
         cleanupFn && cleanupFn();
       }
     };
-  }, []);
+  }, [_pollingFn]);
 };

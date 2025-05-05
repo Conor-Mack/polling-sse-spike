@@ -1,9 +1,9 @@
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { API } from "./requestHandler";
 import { AppointmentCard } from "./AppointmentCard";
 import { usePolling } from "./hooks/usePolling";
 
-type Appointments = Array<Record<string, string>>;
+type Appointments = Record<string, string>;
 const POLLING_INTERVAL = 25000; // 25 seconds
 
 const fetchAppointments = async () => {
@@ -11,27 +11,16 @@ const fetchAppointments = async () => {
   return response;
 };
 
-const clearAppointments = async () => {
-  const response = await API.delete("/appointments");
-  return response;
-};
-
 export const UpcomingAppointments = () => {
-  const [appointments, setAppointments] = useState<Appointments>([]);
+  const [appointments, setAppointments] = useState<Appointments[]>([]);
 
   const getAppointments = useCallback(async () => {
-    const appointments = await fetchAppointments();
-    setAppointments(appointments);
-  }, []);
-
-  const clearAppointments = useCallback(async () => {
-    await clearAppointments();
-    setAppointments([]);
+    const appointment = await fetchAppointments();
+    setAppointments((appointments) => [appointment, ...appointments]);
   }, []);
 
   usePolling({
     pollFn: getAppointments,
-    cleanupFn: clearAppointments,
     interval: POLLING_INTERVAL,
     maxIntervalIterations: 10,
     invokeImmediately: true,

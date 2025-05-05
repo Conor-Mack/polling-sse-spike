@@ -18,19 +18,16 @@ const APPOINTMENT_REASONS = [
   "Routine Checkup",
 ] as const;
 
-const DEFAULT_APPOINTMENT = {
-  id: crypto.randomUUID(),
-  reason_for_appointment: "General Checkup",
-  appointment_date: new Date().toISOString(),
-};
+interface Appointment {
+  id: `${string}-${string}-${string}-${string}-${string}`;
+  reason_for_appointment: string;
+  appointment_date: string;
+}
 
-type Appointment = typeof DEFAULT_APPOINTMENT;
-
-let appointments: Appointment[] = [];
 const MINUTES_UNTIL_APPOINTMENT_START = 3;
 
-function addAppointment(timezone: string) {
-  const appointment: typeof DEFAULT_APPOINTMENT = {
+function generateAppointment(timezone: string) {
+  const appointment: Appointment = {
     id: crypto.randomUUID(),
     reason_for_appointment:
       APPOINTMENT_REASONS[
@@ -42,7 +39,7 @@ function addAppointment(timezone: string) {
         .plus({ minutes: MINUTES_UNTIL_APPOINTMENT_START })
         .toISO() ?? new Date().toISOString(),
   };
-  appointments.unshift(appointment);
+  return appointment;
 }
 
 app.get("/time", (req, res) => {
@@ -53,14 +50,9 @@ app.get("/time", (req, res) => {
 app.get("/appointments", (req, res) => {
   const timezone = req.headers["x-timezone"] as string;
 
-  addAppointment(timezone);
+  const appointment = generateAppointment(timezone);
 
-  res.json(appointments);
-});
-
-app.delete("/appointments", (req, res) => {
-  appointments = [];
-  res.json({ message: "Appointments cleared" });
+  res.json(appointment);
 });
 
 // Start the server and listen for incoming requests
