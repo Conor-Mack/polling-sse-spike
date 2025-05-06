@@ -1,66 +1,37 @@
-# Express Vite React Monorepo
+# Polling Spike
 
-A monorepo setup with Express API and Vite React frontend using pnpm workspaces.
+This is a simple polling spike to test the feasibility of using a polling mechanism to refetch new appointments from the server.
 
-## Project Structure
+It includes a timeout feature that dynamically sets state for disabling the cancel appointment button if the current time is within a given number of minutes before the appointment time.
 
-- `apps/api`: Express API backend
-- `apps/web`: Vite React frontend
-- `packages/`: Shared packages/libraries
+## Starting the project
 
-## Docker Setup
-
-This project includes Docker configuration for easy development and deployment.
-
-### Running with Docker Compose
-
-To start both the API and web app together:
+The client and the server can both be run with docker compose
 
 ```bash
-docker compose up
+docker-compose up -d --build
 ```
 
-This will:
+The server will be available at `http://localhost:5173` and the client will be available at `http://localhost:5174`.
 
-- Build both containers
-- Start the API on http://localhost:3000
-- Start the web app on http://localhost:5173
-- Set up hot-reloading for both services
+## Running locally for development
 
-For development, local changes to source files will be reflected immediately thanks to the volume mounts.
-
-### Individual Docker Builds
-
-If you need to build and run the containers separately:
+The project uses pnpm for package management. To run the project locally, you need to install pnpm first. You can do this with npm:
 
 ```bash
-# Build and run API
-docker build -t api-image -f api.Dockerfile .
-docker run -p 3000:3000 api-image
-
-# Build and run Web app
-docker build -t web-image -f web.Dockerfile .
-docker run -p 5173:5173 web-image
+npm install -g pnpm
 ```
 
-## Development Without Docker
-
-Setup:
+Then, you can install the dependencies and start the project:
 
 ```bash
 pnpm install
 ```
 
-Run API:
+Then run with docker compose:
 
 ```bash
-cd apps/api
-pnpm start
+docker-compose up -d --build
 ```
 
-Run Web app:
-
-```bash
-cd apps/web
-pnpm start
-```
+The server will be available at `http://localhost:5173` and the client will be available at `http://localhost:5174`.
