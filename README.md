@@ -12,7 +12,7 @@ The client and the server can both be run with docker compose
 docker-compose up -d --build
 ```
 
-Access the client at [http://localhost:5174](http://localhost:5174)
+Access the client at [http://localhost:5173](http://localhost:5173)
 
 ## Running locally for development
 
@@ -34,4 +34,4 @@ Then run with docker compose:
 docker-compose up -d --build
 ```
 
-Access the client at [http://localhost:5174](http://localhost:5174)
+Access the client at [http://localhost:5173](http://localhost:5173)
