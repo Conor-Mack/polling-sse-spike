@@ -6,11 +6,11 @@ RUN corepack enable pnpm && corepack install -g pnpm@latest-10
 # Copy minimal files needed for dependency resolution
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
 COPY apps/api/package.json ./apps/api/
-COPY packages/*/package.json ./packages/*/
+# COPY packages/*/package.json ./packages/*/
 
 # Copy only API source code and its dependencies
 COPY apps/api ./apps/api
-COPY packages ./packages
+# COPY packages ./packages
 
 # Install dependencies directly (no fetch+offline approach)
 # This ensures platform-specific dependencies are properly installed
